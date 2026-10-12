@@ -1,0 +1,422 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Content Agent Pro — Week 1 QA (D1)</title>
+  <style>
+    :root {
+      --bg: #f4f6f9;
+      --surface: #ffffff;
+      --surface2: #eef2f7;
+      --text: #1e293b;
+      --muted: #64748b;
+      --accent: #2563eb;
+      --accent-soft: rgba(37, 99, 235, 0.1);
+      --ok: #16a34a;
+      --warn: #d97706;
+      --border: #cbd5e1;
+      --code-bg: #f1f5f9;
+      --radius: 10px;
+      --font: "Segoe UI", system-ui, -apple-system, sans-serif;
+      --mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: var(--font);
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.55;
+      font-size: 15px;
+    }
+    .wrap {
+      max-width: 920px;
+      margin: 0 auto;
+      padding: 2rem 1.25rem 4rem;
+    }
+    header {
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 1.5rem;
+      margin-bottom: 2rem;
+    }
+    h1 {
+      font-size: 1.65rem;
+      font-weight: 650;
+      margin: 0 0 0.5rem;
+      letter-spacing: -0.02em;
+    }
+    .meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem 1rem;
+      color: var(--muted);
+      font-size: 0.875rem;
+    }
+    .badge {
+      display: inline-block;
+      background: var(--accent-soft);
+      color: #93c5fd;
+      padding: 0.2rem 0.55rem;
+      border-radius: 6px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+    .qa-bar {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      box-shadow: 0 1px 8px rgba(15, 23, 42, 0.06);
+      padding: 0.65rem 1rem;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 0.5rem 0.75rem;
+      font-size: 0.875rem;
+    }
+    .qa-bar strong { color: var(--text); margin-right: 0.25rem; }
+    .qa-bar a, .qa-bar button {
+      display: inline-block;
+      padding: 0.35rem 0.7rem;
+      border-radius: 6px;
+      text-decoration: none;
+      font-family: var(--font);
+      font-size: 0.8125rem;
+      cursor: pointer;
+    }
+    .qa-bar a {
+      background: var(--accent-soft);
+      color: var(--accent);
+      font-weight: 600;
+    }
+    .qa-bar a:hover { background: rgba(37, 99, 235, 0.18); }
+    .qa-bar button {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      color: var(--text);
+    }
+    .qa-bar button:hover { border-color: var(--accent); }
+    .toc {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 0.85rem 1rem;
+      margin: 0 0 1.5rem;
+      font-size: 0.9rem;
+    }
+    .toc a { margin-right: 1rem; white-space: nowrap; }
+    h2 {
+      font-size: 1.15rem;
+      margin: 2rem 0 0.75rem;
+      color: var(--text);
+      scroll-margin-top: 4rem;
+    }
+    p { margin: 0.5rem 0 1rem; color: #334155; }
+    ul { margin: 0.5rem 0 1rem; padding-left: 1.25rem; color: #334155; }
+    li { margin: 0.35rem 0; }
+    a { color: #60a5fa; }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.9rem;
+      margin: 0.75rem 0 1.25rem;
+      background: var(--surface);
+      border-radius: var(--radius);
+      overflow: hidden;
+      border: 1px solid var(--border);
+    }
+    th, td {
+      padding: 0.65rem 0.85rem;
+      text-align: left;
+      border-bottom: 1px solid var(--border);
+      vertical-align: top;
+    }
+    th {
+      background: var(--surface2);
+      font-weight: 600;
+      color: var(--text);
+    }
+    tr:last-child td { border-bottom: none; }
+    code {
+      font-family: var(--mono);
+      font-size: 0.82em;
+      background: var(--code-bg);
+      padding: 0.12em 0.35em;
+      border-radius: 4px;
+      color: #0f172a;
+    }
+    .url-box {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1rem 1.1rem;
+      margin: 1rem 0;
+    }
+    .url-box a {
+      font-weight: 600;
+      word-break: break-all;
+    }
+    pre {
+      background: var(--code-bg);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1rem;
+      overflow-x: auto;
+      font-family: var(--mono);
+      font-size: 0.8rem;
+      line-height: 1.45;
+      margin: 0.75rem 0 1rem;
+      position: relative;
+    }
+    .copy-btn {
+      position: absolute;
+      top: 0.5rem;
+      right: 0.5rem;
+      font-size: 0.7rem;
+      padding: 0.25rem 0.5rem;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      color: var(--muted);
+      border-radius: 6px;
+      cursor: pointer;
+      font-family: var(--font);
+    }
+    .copy-btn:hover { color: var(--text); border-color: var(--accent); }
+    .checklist {
+      list-style: none;
+      padding: 0;
+      margin: 0.75rem 0;
+    }
+    .checklist li {
+      display: flex;
+      align-items: flex-start;
+      gap: 0.65rem;
+      padding: 0.55rem 0;
+      border-bottom: 1px solid var(--border);
+    }
+    .checklist li:last-child { border-bottom: none; }
+    .checklist input { margin-top: 0.25rem; accent-color: var(--accent); }
+    .out-scope {
+      background: rgba(245, 158, 11, 0.08);
+      border: 1px solid rgba(245, 158, 11, 0.25);
+      border-radius: var(--radius);
+      padding: 1rem 1.1rem;
+      margin: 0.75rem 0;
+    }
+    .out-scope ul { margin-bottom: 0; }
+    .status-pill {
+      display: inline-block;
+      font-size: 0.72rem;
+      padding: 0.15rem 0.45rem;
+      border-radius: 4px;
+      font-weight: 600;
+    }
+    .pill-ok { background: rgba(22, 163, 74, 0.15); color: #15803d; }
+    .pill-warn { background: rgba(217, 119, 6, 0.15); color: #b45309; }
+    footer {
+      margin-top: 3rem;
+      padding-top: 1rem;
+      border-top: 1px solid var(--border);
+      font-size: 0.8rem;
+      color: var(--muted);
+    }
+    @media print {
+      body { background: #fff; color: #111; }
+      :root { --surface: #f8fafc; --surface2: #e2e8f0; --border: #cbd5e1; --text: #111; }
+      .copy-btn { display: none; }
+    }
+  </style>
+</head>
+<body>
+  <nav class="qa-bar" aria-label="QA shortcuts">
+    <strong>Week 1 QA</strong>
+    <a href="#tests">Test cases</a>
+    <a href="#exit">Exit criteria</a>
+    <a href="https://neoiq-ai-visibility.beta.commerceiq.ai/healthz" target="_blank" rel="noopener">Open /healthz</a>
+    <a href="https://neoiq-ai-visibility.beta.commerceiq.ai/readyz" target="_blank" rel="noopener">Open /readyz</a>
+    <button type="button" onclick="window.print()">Print / PDF</button>
+  </nav>
+  <div class="wrap">
+    <header>
+      <span class="badge">Week 1 · D1</span>
+      <h1>Content Agent Pro — QA handoff</h1>
+      <div class="meta">
+        <span><strong>Audience:</strong> QA</span>
+        <span><strong>Updated:</strong> 2026-10-12</span>
+        <span><strong>Scope:</strong> Beta health smoke + contract pointers only</span>
+      </div>
+    </header>
+
+    <nav class="toc" aria-label="Contents">
+      <strong>Jump to:</strong>
+      <a href="#objective">Objective</a>
+      <a href="#environment">Environment</a>
+      <a href="#tests">Tests</a>
+      <a href="#contracts">Contracts</a>
+      <a href="#rest-assured">Rest Assured</a>
+      <a href="#out-of-scope">Out of scope</a>
+      <a href="#exit">Exit criteria</a>
+    </nav>
+
+    <section id="objective">
+      <h2>1. Objective</h2>
+      <p>Verify <strong>neoiq-ai-visibility-service</strong> on <strong>beta</strong> and that Kubernetes probes match design:</p>
+      <ul>
+        <li><strong>Liveness</strong> — <code>GET /healthz</code>: process up; does <strong>not</strong> touch Postgres.</li>
+        <li><strong>Readiness</strong> — <code>GET /readyz</code>: HTTP <strong>200</strong> only when Pro Postgres (<code>neoiq_ai_visibility</code>) answers <code>SELECT 1</code>.</li>
+      </ul>
+      <p>Automate both in the <strong>Rest Assured Pro module</strong> (section 5).</p>
+    </section>
+
+    <section id="environment">
+      <h2>2. Environment</h2>
+      <div class="url-box">
+        <div style="color:var(--muted);font-size:0.8rem;margin-bottom:0.35rem;">Beta base URL</div>
+        <a href="https://neoiq-ai-visibility.beta.commerceiq.ai/healthz" target="_blank" rel="noopener">https://neoiq-ai-visibility.beta.commerceiq.ai</a>
+      </div>
+      <table>
+        <thead>
+          <tr><th>Item</th><th>Value</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>Liveness</td><td><code>GET /healthz</code></td></tr>
+          <tr><td>Readiness</td><td><code>GET /readyz</code></td></tr>
+          <tr><td>Auth</td><td><strong>None</strong> for these endpoints</td></tr>
+        </tbody>
+      </table>
+      <p><strong>Manual smoke</strong></p>
+      <pre id="curl-block"><button type="button" class="copy-btn" data-copy="curl-block">Copy</button>curl -sS https://neoiq-ai-visibility.beta.commerceiq.ai/healthz
+curl -sS -w "\nHTTP %{http_code}\n" https://neoiq-ai-visibility.beta.commerceiq.ai/readyz</pre>
+    </section>
+
+    <section id="tests">
+      <h2>3. Test cases (Week 1)</h2>
+      <table>
+        <thead>
+          <tr><th>ID</th><th>Test</th><th>Steps</th><th>Expected</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>W1-01</strong></td>
+            <td>Liveness</td>
+            <td><code>GET {base}/healthz</code></td>
+            <td>HTTP <strong>200</strong>, <code>{"status":"ok"}</code></td>
+          </tr>
+          <tr>
+            <td><strong>W1-02</strong></td>
+            <td>Readiness</td>
+            <td><code>GET {base}/readyz</code></td>
+            <td>HTTP <strong>200</strong>, <code>{"status":"ok"}</code> (beta healthy)</td>
+          </tr>
+          <tr>
+            <td><strong>W1-03</strong></td>
+            <td>Automation</td>
+            <td>Rest Assured Pro runs W1-01 + W1-02</td>
+            <td>Same as W1-01, W1-02</td>
+          </tr>
+        </tbody>
+      </table>
+      <p style="font-size:0.9rem;color:var(--muted);">
+        Negative cases live in service CI (<code>tests/test_health.py</code>): <code>/healthz</code> stays 200 when DB is down;
+        <code>/readyz</code> returns 503 <code>{"status":"not_ready"}</code>.
+      </p>
+    </section>
+
+    <section id="contracts">
+      <h2>4. Week 1 contracts (reference)</h2>
+      <p>QA does not re-run full schema/pipeline validation in Week 1 unless BE asks. Confirm <strong>CI green</strong> on contract PRs.</p>
+      <table>
+        <thead>
+          <tr><th>Contract</th><th>ID</th><th>Artifact</th><th>Verification</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Schema v1</td>
+            <td><strong>A1–A2</strong></td>
+            <td><code>contracts/schema_contract.json</code></td>
+            <td>CI: <code>tests/test_schema_contract.py</code></td>
+          </tr>
+          <tr>
+            <td>OpenAPI</td>
+            <td><strong>B1</strong></td>
+            <td><code>contracts/openapi.json</code></td>
+            <td><span class="status-pill pill-warn">Not merged</span> — use <code>contracts/api.md</code> for planning</td>
+          </tr>
+          <tr>
+            <td>Pipeline</td>
+            <td><strong>C1</strong></td>
+            <td><code>neoiq-data-platform</code> → <code>contract_constants.py</code></td>
+            <td>CI: <code>test_contract_constants.py</code></td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section id="rest-assured">
+      <h2>5. Rest Assured (Week 1 deliverable)</h2>
+      <p><strong>Framework:</strong> <code>tooling/rest-assured-api-test-framework</code></p>
+      <ol>
+        <li>Add <strong>Pro</strong> / <strong>neoiq-ai-visibility</strong> module.</li>
+        <li>Config: <code>base.url=https://neoiq-ai-visibility.beta.commerceiq.ai</code></li>
+        <li>Implement <strong>W1-01</strong> and <strong>W1-02</strong>.</li>
+      </ol>
+      <pre id="java-block"><button type="button" class="copy-btn" data-copy="java-block">Copy</button>given().baseUri(baseUrl).when().get("/healthz").then()
+  .statusCode(200).body("status", equalTo("ok"));</pre>
+    </section>
+
+    <section id="out-of-scope">
+      <h2>6. Out of scope (Week 1)</h2>
+      <div class="out-scope">
+        <ul>
+          <li>Customer API <code>GET /api/v1/pro/*</code> (not built)</li>
+          <li>Admin API routes</li>
+          <li>Tenant headers and error codes</li>
+          <li>canvas-proxy browser path</li>
+          <li>Dagster <code>pro_sync_job</code> on beta (separate deploy track)</li>
+        </ul>
+      </div>
+    </section>
+
+    <section id="exit">
+      <h2>7. Exit criteria</h2>
+      <ul class="checklist">
+        <li><input type="checkbox" id="c1" /><label for="c1"><strong>W1-01</strong> and <strong>W1-02</strong> pass manually on beta</label></li>
+        <li><input type="checkbox" id="c2" /><label for="c2">Rest Assured Pro module merged with health smokes (<strong>W1-03</strong>)</label></li>
+        <li><input type="checkbox" id="c3" /><label for="c3">Team knows <strong>B1</strong> API tests wait on <code>openapi.json</code></label></li>
+      </ul>
+    </section>
+
+    <section id="repos">
+      <h2>8. Repos</h2>
+      <table>
+        <thead><tr><th>Repo</th><th>Role</th></tr></thead>
+        <tbody>
+          <tr><td><code>commerceiq/neoiq-ai-visibility-service</code></td><td>API, schema, health, D1</td></tr>
+          <tr><td><code>commerceiq/neoiq-data-platform</code></td><td>Pipeline contract (C1) reference only</td></tr>
+        </tbody>
+      </table>
+    </section>
+
+    <footer>
+      Pair with <code>week-1-d1-health-and-contracts.md</code> in this folder. Open this HTML in any browser to preview or print to PDF.
+    </footer>
+  </div>
+  <script>
+    document.querySelectorAll(".copy-btn").forEach(function (btn) {
+      btn.addEventListener("click", function () {
+        var pre = document.getElementById(btn.getAttribute("data-copy"));
+        var text = pre.innerText.replace(/^Copy\n?/, "").trim();
+        navigator.clipboard.writeText(text).then(function () {
+          var label = btn.textContent;
+          btn.textContent = "Copied";
+          setTimeout(function () { btn.textContent = label; }, 1500);
+        });
+      });
+    });
+  </script>
+</body>
+</html>
