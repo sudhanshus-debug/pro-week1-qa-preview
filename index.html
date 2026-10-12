@@ -253,6 +253,27 @@
       font-size: 0.92rem;
       color: #78350f;
     }
+    .constraints-block {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-left: 4px solid var(--accent);
+      border-radius: var(--radius);
+      padding: 0.9rem 1.1rem;
+      margin: 1rem 0;
+    }
+    .constraints-block h3 {
+      margin: 0 0 0.35rem;
+      font-size: 0.95rem;
+    }
+    .constraints-block .doc-link {
+      font-size: 0.85rem;
+      margin-bottom: 0.5rem;
+      display: block;
+    }
+    .constraints-block ul {
+      margin: 0.35rem 0 0;
+      font-size: 0.88rem;
+    }
     footer {
       margin-top: 3rem;
       padding-top: 1rem;
@@ -414,8 +435,46 @@ curl -sS -w "\nHTTP %{http_code}\n" https://neoiq-ai-visibility.beta.commerceiq.
         </tbody>
       </table>
 
+      <h3 style="margin-top:1.5rem;font-size:1.05rem;">Contract constraints (for test-plan writing — not beta execution)</h3>
+
+      <div class="constraints-block">
+        <h3>A1–A2 · Schema v1</h3>
+        <a class="doc-link" href="https://github.com/commerceiq/neoiq-ai-visibility-service/blob/develop/contracts/schema_contract.json" target="_blank" rel="noopener">develop → schema_contract.json</a>
+        <ul>
+          <li>Every Pro Postgres table/column name, type, and nullability is fixed in JSON.</li>
+          <li>JSON columns must match schemas in <code>contracts/payloads/*.json</code>.</li>
+          <li>BE CI fails if models drift from the file (<code>tests/test_schema_contract.py</code>).</li>
+        </ul>
+      </div>
+
+      <div class="constraints-block">
+        <h3>B1 · OpenAPI (API)</h3>
+        <a class="doc-link" href="https://github.com/commerceiq/neoiq-ai-visibility-service/blob/develop/contracts/api.md" target="_blank" rel="noopener">develop → api.md</a> <span class="status-pill pill-warn">openapi.json not on develop yet</span>
+        <ul>
+          <li>Defines future <code>/api/v1/pro/*</code> and admin routes, request headers, and error codes.</li>
+          <li>UI must not compute metrics — only display API fields (plan cases from <code>api.md</code>).</li>
+          <li>No Pro HTTP API to run on beta until routes ship (Week 2+).</li>
+        </ul>
+      </div>
+
+      <div class="constraints-block">
+        <h3>C1 · Pipeline (Dagster Pro sync)</h3>
+        <a class="doc-link" href="https://github.com/commerceiq/neoiq-data-platform/blob/develop/dagster_code/pro/contract_constants.py" target="_blank" rel="noopener">develop → contract_constants.py</a>
+        <ul>
+          <li><strong>DB role:</strong> <code>pro_pipeline</code> · Dagster tag <code>pipeline=pro</code>.</li>
+          <li><strong>Cycle states</strong> (on <code>pro_refresh_cycle</code>): <code>open</code>, <code>ready</code>, <code>reported</code>, <code>incomplete</code>, <code>failed</code>.</li>
+          <li><strong>crawl_result.result_type</strong> (pipeline): <code>prompt_answer</code>, <code>product_call</code>, <code>chip_answer</code> (PDP read from Databricks, not <code>crawl_result</code>).</li>
+          <li><strong>Tables pipeline may write:</strong> <code>pro_refresh_cycle</code>, <code>crawl_*</code> targets, <code>crawl_result</code>, snapshot tables, <code>asin_cycle_result</code>, <code>pro_sync_watermark</code>, <code>topic</code>, <code>tracked_prompt</code>, <code>asin_slot</code> (after activation rules).</li>
+          <li><strong>Queue tables:</strong> pipeline may only set <code>applied_cycle_id</code> on <code>prompt_edit_queue</code> / <code>asin_swap_queue</code>.</li>
+          <li><strong>Insert-only audit:</strong> <code>pro_admin_action</code>.</li>
+          <li><strong>Pipeline must not write:</strong> <code>pro_account</code>, <code>pro_user_action</code>, queues (except column above), <code>pro_schema_version</code>.</li>
+          <li><strong>Timing:</strong> <code>INCOMPLETE_GRACE_HOURS = 48</code> after cycle end for late crawls.</li>
+          <li>Must stay aligned with A1–A2 schema; CI: <code>neoiq-data-platform/tests/dagster_code/pro/test_contract_constants.py</code>.</li>
+        </ul>
+      </div>
+
       <p style="font-size:0.9rem;color:var(--muted);margin-top:1rem;">
-        <strong>Summary:</strong> Week 1 <strong>run on beta</strong> = <strong>W1-01, W1-02, W1-03</strong> (health). Week 1 <strong>docs</strong> = table above for test-plan + Rest Assured setup.
+        <strong>Summary:</strong> Week 1 <strong>run on beta</strong> = <strong>W1-01, W1-02, W1-03</strong> (health only). Contracts above = <strong>planning docs</strong> + develop links, not Week 1 test execution.
       </p>
     </section>
 
@@ -465,7 +524,7 @@ curl -sS -w "\nHTTP %{http_code}\n" https://neoiq-ai-visibility.beta.commerceiq.
     </section>
 
     <footer>
-      Pair with <code>week-1-d1-health-and-contracts.md</code> in this folder. Open this HTML in any browser to preview or print to PDF.
+      Preview v3 · Week 1 QA handoff. Hard-refresh (Cmd+Shift+R) if section 4 looks outdated.
     </footer>
   </div>
   <script>
