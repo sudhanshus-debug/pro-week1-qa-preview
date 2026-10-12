@@ -370,38 +370,52 @@ curl -sS -w "\nHTTP %{http_code}\n" https://neoiq-ai-visibility.beta.commerceiq.
         Engineering verifies them in CI on every PR.
       </div>
 
-      <div class="contract-card">
-        <h3>A1–A2 — Database schema contract (Postgres tables &amp; columns)</h3>
-        <div class="id-line">Ticket label: <strong>A1–A2</strong> · Schema v1</div>
-        <p><strong>What it is:</strong> A frozen list of Pro Postgres tables and columns the API and pipeline both rely on
-          (<code>contracts/schema_contract.json</code> in <code>neoiq-ai-visibility-service</code>).</p>
-        <p><strong>Who checks it:</strong> Backend CI — if someone changes the DB model without updating the contract file, the build fails
-          (<code>tests/test_schema_contract.py</code>).</p>
-        <div class="qa-action"><strong>QA Week 1:</strong> <span class="status-pill pill-muted">No action</span> — do not validate tables in beta. Optional: note “schema contract PR merged + CI green” if your process tracks it.</div>
-      </div>
-
-      <div class="contract-card">
-        <h3>B1 — OpenAPI contract (HTTP API shape for Pro dashboard &amp; admin)</h3>
-        <div class="id-line">Ticket label: <strong>B1</strong> · OpenAPI</div>
-        <p><strong>What it is:</strong> The machine-readable spec for future <code>/api/v1/pro/*</code> endpoints (Swagger/OpenAPI).
-          File will be <code>contracts/openapi.json</code> when the B1 ticket lands.</p>
-        <p><strong>Status today:</strong> <span class="status-pill pill-warn">Not merged yet</span> — endpoints are described in
-          <code>contracts/api.md</code> for planning only. <strong>No live Pro API to test in Week 1.</strong></p>
-        <div class="qa-action"><strong>QA Week 1:</strong> <span class="status-pill pill-muted">No API tests</span> — wait until B1 + Week 2+ when dashboard routes exist. Rest Assured Pro module this week = health only.</div>
-      </div>
-
-      <div class="contract-card">
-        <h3>C1 — Pipeline contract (Dagster Pro job ↔ same DB rules)</h3>
-        <div class="id-line">Ticket label: <strong>C1</strong> · Pipeline contract</div>
-        <p><strong>What it is:</strong> Shared constants in <code>neoiq-data-platform</code>
-          (<code>dagster_code/pro/contract_constants.py</code>) — cycle states, table names the pipeline may write, role
-          <code>pro_pipeline</code> — must stay aligned with the Postgres schema above.</p>
-        <p><strong>Who checks it:</strong> Data platform CI (<code>tests/dagster_code/pro/test_contract_constants.py</code>).</p>
-        <div class="qa-action"><strong>QA Week 1:</strong> <span class="status-pill pill-muted">No action</span> — do not run Dagster jobs as part of Week 1 exit criteria. Pipeline E2E is a later week.</div>
-      </div>
+      <p>Use these <strong>develop</strong> links when writing the Week 1 test plan. They are <strong>inputs only</strong> — not executed on beta in Week 1 (except health smokes in section 3).</p>
+      <table>
+        <thead>
+          <tr>
+            <th>Contract</th>
+            <th>ID</th>
+            <th>Doc (<code>develop</code>)</th>
+            <th>Constraints (what it fixes)</th>
+            <th>QA Week 1</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Schema v1</td>
+            <td><strong>A1–A2</strong></td>
+            <td>
+              <a href="https://github.com/commerceiq/neoiq-ai-visibility-service/blob/develop/contracts/schema_contract.json" target="_blank" rel="noopener">schema_contract.json</a><br />
+              <a href="https://github.com/commerceiq/neoiq-ai-visibility-service/blob/develop/contracts/README.md" target="_blank" rel="noopener">contracts/README.md</a>
+            </td>
+            <td>Pro Postgres table/column names, types, nullability; JSON payloads under <code>contracts/payloads/</code>. CI: <code>tests/test_schema_contract.py</code>.</td>
+            <td><span class="status-pill pill-muted">Plan only</span> — no beta DB validation</td>
+          </tr>
+          <tr>
+            <td>OpenAPI</td>
+            <td><strong>B1</strong></td>
+            <td>
+              <a href="https://github.com/commerceiq/neoiq-ai-visibility-service/blob/develop/contracts/api.md" target="_blank" rel="noopener">api.md</a>
+              <span class="status-pill pill-warn">openapi.json not on develop yet</span>
+            </td>
+            <td>Future <code>/api/v1/pro/*</code> + admin routes, tenant headers, errors. Use <code>api.md</code> for test-plan cases until B1 adds <code>contracts/openapi.json</code>.</td>
+            <td><span class="status-pill pill-muted">Plan only</span> — no Pro API calls on beta</td>
+          </tr>
+          <tr>
+            <td>Pipeline</td>
+            <td><strong>C1</strong></td>
+            <td>
+              <a href="https://github.com/commerceiq/neoiq-data-platform/blob/develop/dagster_code/pro/contract_constants.py" target="_blank" rel="noopener">contract_constants.py</a>
+            </td>
+            <td>Cycle states, <code>crawl_result</code> types, tables <code>pro_pipeline</code> may write, Dagster tags <code>pipeline=pro</code>. Must match A1–A2 schema. CI: <code>test_contract_constants.py</code>.</td>
+            <td><span class="status-pill pill-muted">Plan only</span> — no Dagster E2E</td>
+          </tr>
+        </tbody>
+      </table>
 
       <p style="font-size:0.9rem;color:var(--muted);margin-top:1rem;">
-        <strong>Summary for QA:</strong> Week 1 exit = <strong>W1-01, W1-02, W1-03</strong> only. A1–A2 / B1 / C1 = Engineering contract gates, not manual QA scope this week.
+        <strong>Summary:</strong> Week 1 <strong>run on beta</strong> = <strong>W1-01, W1-02, W1-03</strong> (health). Week 1 <strong>docs</strong> = table above for test-plan + Rest Assured setup.
       </p>
     </section>
 
